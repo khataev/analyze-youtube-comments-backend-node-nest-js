@@ -1,0 +1,4 @@
+{
+  // В проекте ESLint + Prettier; Biome не понимает декораторы параметров (@Inject в конструкторе)
+  "biome.enabled": false
+}

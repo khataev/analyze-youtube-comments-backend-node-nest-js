@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    // nodenext + package.json без "type": "module" → сборка в CommonJS (дефолт Nest).
+    // Node 24 умеет require() для ESM-only пакетов (p-limit, p-retry)
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "types": ["node"],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "exactOptionalPropertyTypes": false,
+    // Декораторы Nest и метаданные типов параметров конструктора: на них держится DI
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "sourceMap": true,
+    "incremental": true,
+    "outDir": "./dist",
+    "rootDir": "."
+  },
+  "include": ["src", "test", "vitest.config.mts"]
+}

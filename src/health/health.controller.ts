@@ -1,0 +1,18 @@
+import { Controller, Get } from '@nestjs/common';
+import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
+import { RedisHealthIndicator } from './redis.health';
+
+@Controller('health')
+export class HealthController {
+  constructor(
+    private readonly health: HealthCheckService,
+    private readonly redis: RedisHealthIndicator,
+  ) {}
+
+  /** 200 `{"status": "ok", ...}` или 503 `{"status": "error", ...}` (бросает сам terminus). */
+  @Get()
+  @HealthCheck()
+  check() {
+    return this.health.check([() => this.redis.check('redis')]);
+  }
+}
