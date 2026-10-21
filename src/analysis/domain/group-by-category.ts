@@ -1,4 +1,4 @@
-import type { AnalysisResult } from './task-record';
+import type { AnalysisResult } from './analysis-task';
 import type { Comment, CommentClassification } from './comment';
 
 /**

@@ -2,7 +2,7 @@ import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Category } from '../../src/analysis/domain/category';
-import { newTaskRecord } from '../../src/analysis/domain/task-record';
+import { createAnalysisTask } from '../../src/analysis/domain/analysis-task';
 import { TaskStatus } from '../../src/analysis/domain/task-status';
 import { createApiApp } from '../support/api-app';
 import { fakeRedis, type InMemoryTaskRepository } from '../support/fakes';
@@ -67,17 +67,17 @@ describe('HTTP API', () => {
 
   describe('GET /api/v1/analysis/:taskId', () => {
     it('returns the task in snake_case', async () => {
-      const record = newTaskRecord('11111111-1111-4111-8111-111111111111', 'dQw4w9WgXcQ');
+      const task = createAnalysisTask('11111111-1111-4111-8111-111111111111', 'dQw4w9WgXcQ');
       await repository.save({
-        ...record,
+        ...task,
         status: TaskStatus.Completed,
         result: { [Category.Thanks]: [{ id: 'a', text: 'Thanks!' }] },
       });
 
-      const response = await http().get(`/api/v1/analysis/${record.taskId}`).expect(200);
+      const response = await http().get(`/api/v1/analysis/${task.id}`).expect(200);
 
       expect(response.body).toEqual({
-        task_id: record.taskId,
+        task_id: task.id,
         status: 'completed',
         result: { Thanks: [{ id: 'a', text: 'Thanks!' }] },
         error: null,

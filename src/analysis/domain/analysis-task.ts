@@ -9,9 +9,9 @@ export const analysisResultSchema = z.partialRecord(categorySchema, z.array(comm
 /** Комментарии, сгруппированные по категориям. Пустые категории отсутствуют. */
 export type AnalysisResult = z.output<typeof analysisResultSchema>;
 
-/** Внутренняя модель задачи. В API напрямую не отдаётся (см. dto/). */
-export interface TaskRecord {
-  taskId: string;
+/** Доменная сущность задачи анализа. В API напрямую не отдаётся (см. dto/). */
+export interface AnalysisTask {
+  id: string;
   videoId: string;
   status: TaskStatus;
   result: AnalysisResult | null;
@@ -20,10 +20,10 @@ export interface TaskRecord {
   updatedAt: Date;
 }
 
-export function newTaskRecord(taskId: string, videoId: string): TaskRecord {
+export function createAnalysisTask(id: string, videoId: string): AnalysisTask {
   const now = new Date();
   return {
-    taskId,
+    id,
     videoId,
     status: TaskStatus.Pending,
     result: null,
@@ -37,7 +37,7 @@ export function newTaskRecord(taskId: string, videoId: string): TaskRecord {
  * Формат хранения в Redis — тот же JSON в snake_case, что пишет Python-версия.
  * Поэтому обе реализации могут работать с одним Redis и читать задачи друг друга.
  */
-export const storedTaskRecordSchema = z
+export const storedAnalysisTaskSchema = z
   .object({
     task_id: z.uuid(),
     video_id: z.string(),
@@ -47,8 +47,8 @@ export const storedTaskRecordSchema = z
     created_at: z.coerce.date(),
     updated_at: z.coerce.date(),
   })
-  .transform((raw): TaskRecord => ({
-    taskId: raw.task_id,
+  .transform((raw): AnalysisTask => ({
+    id: raw.task_id,
     videoId: raw.video_id,
     status: raw.status,
     result: raw.result,
@@ -57,14 +57,14 @@ export const storedTaskRecordSchema = z
     updatedAt: raw.updated_at,
   }));
 
-export function serializeTaskRecord(record: TaskRecord): string {
+export function serializeAnalysisTask(task: AnalysisTask): string {
   return JSON.stringify({
-    task_id: record.taskId,
-    video_id: record.videoId,
-    status: record.status,
-    result: record.result,
-    error: record.error,
-    created_at: record.createdAt.toISOString(),
-    updated_at: record.updatedAt.toISOString(),
+    task_id: task.id,
+    video_id: task.videoId,
+    status: task.status,
+    result: task.result,
+    error: task.error,
+    created_at: task.createdAt.toISOString(),
+    updated_at: task.updatedAt.toISOString(),
   });
 }

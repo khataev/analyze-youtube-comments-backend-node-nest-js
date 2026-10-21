@@ -28,12 +28,12 @@ describe('AnalysisService', () => {
   });
 
   it('saves a pending task and puts it into the queue', async () => {
-    const record = await service.start('dQw4w9WgXcQ');
+    const task = await service.start('dQw4w9WgXcQ');
 
-    expect(record.status).toBe(TaskStatus.Pending);
-    expect(record.videoId).toBe('dQw4w9WgXcQ');
-    expect(queue.enqueued).toEqual([record.taskId]);
-    expect(await repository.get(record.taskId)).toMatchObject({ status: TaskStatus.Pending });
+    expect(task.status).toBe(TaskStatus.Pending);
+    expect(task.videoId).toBe('dQw4w9WgXcQ');
+    expect(queue.enqueued).toEqual([task.id]);
+    expect(await repository.get(task.id)).toMatchObject({ status: TaskStatus.Pending });
   });
 
   it('marks the task as failed if it could not be enqueued', async () => {
@@ -41,14 +41,14 @@ describe('AnalysisService', () => {
 
     await expect(service.start('dQw4w9WgXcQ')).rejects.toBeInstanceOf(StorageUnavailableError);
 
-    const [stored] = [...repository.records.values()];
+    const [stored] = [...repository.tasks.values()];
     expect(stored).toMatchObject({ status: TaskStatus.Failed, error: 'Failed to enqueue task' });
   });
 
   it('returns a stored task', async () => {
-    const { taskId } = await service.start('dQw4w9WgXcQ');
+    const { id } = await service.start('dQw4w9WgXcQ');
 
-    await expect(service.get(taskId)).resolves.toMatchObject({ taskId });
+    await expect(service.get(id)).resolves.toMatchObject({ id });
   });
 
   it('throws a domain error for an unknown task', async () => {

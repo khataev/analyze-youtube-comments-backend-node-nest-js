@@ -9,8 +9,8 @@ import {
   Post,
 } from '@nestjs/common';
 import { AnalysisService } from './analysis.service';
-import { CreateAnalysisDto } from './dto/create-analysis.dto';
-import { TaskCreatedResponse, TaskStatusResponse } from './dto/task.responses';
+import { AnalyzeRequest } from './dto/analyze-request.dto';
+import { TaskCreatedResponse, TaskStatusResponse } from './dto/task-responses.dto';
 
 /**
  * Контроллер знает только HTTP: маршруты, коды ответа, преобразование в DTO.
@@ -23,9 +23,9 @@ export class AnalysisController {
 
   @Post()
   @HttpCode(HttpStatus.ACCEPTED)
-  async start(@Body() body: CreateAnalysisDto): Promise<TaskCreatedResponse> {
-    const record = await this.analysis.start(body.videoId);
-    return new TaskCreatedResponse(record.taskId);
+  async start(@Body() body: AnalyzeRequest): Promise<TaskCreatedResponse> {
+    const task = await this.analysis.start(body.videoId);
+    return new TaskCreatedResponse(task.id);
   }
 
   @Get(':taskId')
@@ -34,6 +34,6 @@ export class AnalysisController {
     @Param('taskId', new ParseUUIDPipe({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY }))
     taskId: string,
   ): Promise<TaskStatusResponse> {
-    return TaskStatusResponse.fromRecord(await this.analysis.get(taskId));
+    return TaskStatusResponse.fromTask(await this.analysis.get(taskId));
   }
 }

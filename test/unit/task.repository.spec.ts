@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { newTaskRecord } from '../../src/analysis/domain/task-record';
+import { createAnalysisTask } from '../../src/analysis/domain/analysis-task';
 import { TaskRepository } from '../../src/analysis/task.repository';
 import { StorageUnavailableError } from '../../src/common/errors/domain.error';
 import { testConfig } from '../support/config';
@@ -11,10 +11,10 @@ function repositoryWith(redis: object) {
 }
 
 describe('TaskRepository', () => {
-  it('stores a snake_case JSON record under analysis:task:<id> with TTL', async () => {
+  it('stores a snake_case JSON task under analysis:task:<id> with TTL', async () => {
     const redis = { set: vi.fn().mockResolvedValue('OK') };
 
-    await repositoryWith(redis).save(newTaskRecord(TASK_ID, 'dQw4w9WgXcQ'));
+    await repositoryWith(redis).save(createAnalysisTask(TASK_ID, 'dQw4w9WgXcQ'));
 
     expect(redis.set).toHaveBeenCalledWith(
       `analysis:task:${TASK_ID}`,
@@ -32,8 +32,8 @@ describe('TaskRepository', () => {
     });
   });
 
-  it('reads a record written by the Python version', async () => {
-    const pythonRecord = JSON.stringify({
+  it('reads a task written by the Python version', async () => {
+    const pythonTask = JSON.stringify({
       task_id: TASK_ID,
       video_id: 'dQw4w9WgXcQ',
       status: 'completed',
@@ -42,16 +42,16 @@ describe('TaskRepository', () => {
       created_at: '2026-10-16T10:00:00.123456Z',
       updated_at: '2026-10-16T10:00:05.654321+00:00',
     });
-    const redis = { get: vi.fn().mockResolvedValue(pythonRecord) };
+    const redis = { get: vi.fn().mockResolvedValue(pythonTask) };
 
-    const record = await repositoryWith(redis).get(TASK_ID);
+    const task = await repositoryWith(redis).get(TASK_ID);
 
-    expect(record).toMatchObject({
-      taskId: TASK_ID,
+    expect(task).toMatchObject({
+      id: TASK_ID,
       status: 'completed',
       result: { Thanks: [{ id: 'a', text: 'Thanks!' }] },
     });
-    expect(record?.updatedAt).toBeInstanceOf(Date);
+    expect(task?.updatedAt).toBeInstanceOf(Date);
   });
 
   it('returns null for a missing key', async () => {

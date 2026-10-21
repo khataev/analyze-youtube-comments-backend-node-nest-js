@@ -8,7 +8,7 @@ import {
   type CommentClassifier,
   type CommentSource,
 } from './domain/ports';
-import type { TaskRecord } from './domain/task-record';
+import type { AnalysisTask } from './domain/analysis-task';
 import { isFinished, TaskStatus } from './domain/task-status';
 import { TaskRepository } from './task.repository';
 
@@ -56,17 +56,17 @@ export class CommentAnalyzer {
       return;
     }
 
-    const record = await this.repository.save({
+    const task = await this.repository.save({
       ...found,
       status: TaskStatus.Processing,
       error: null,
     });
-    this.logger.log({ video_id: record.videoId, attempt: options.attempt }, 'Processing video');
+    this.logger.log({ video_id: task.videoId, attempt: options.attempt }, 'Processing video');
     const started = performance.now();
 
     try {
       this.logger.log('Step 1/3: fetching comments from YouTube');
-      const comments = await this.source.fetchComments(record.videoId, options);
+      const comments = await this.source.fetchComments(task.videoId, options);
       this.logger.log({ comments: comments.length }, 'Fetched comments');
 
       this.logger.log('Step 2/3: classifying with LLM');
@@ -76,27 +76,27 @@ export class CommentAnalyzer {
 
       this.logger.log('Step 3/3: saving result');
       const result = groupByCategory(comments, classifications);
-      await this.repository.save({ ...record, status: TaskStatus.Completed, result });
+      await this.repository.save({ ...task, status: TaskStatus.Completed, result });
 
       const counts = Object.fromEntries(Object.entries(result).map(([k, v]) => [k, v.length]));
       this.logger.log({ duration_s: seconds(started), counts }, 'Completed');
     } catch (err) {
-      await this.handleFailure(record, this.normalize(err, options.signal), options);
+      await this.handleFailure(task, this.normalize(err, options.signal), options);
     }
   }
 
   /** Страховка на случай, когда задача упала вне run() (например, зависла и исчерпала лимит). */
   async markFailedIfUnfinished(taskId: string, error: string): Promise<void> {
-    const record = await this.repository.get(taskId);
-    if (record === null || isFinished(record.status)) return;
-    await this.repository.save({ ...record, status: TaskStatus.Failed, error });
+    const task = await this.repository.get(taskId);
+    if (task === null || isFinished(task.status)) return;
+    await this.repository.save({ ...task, status: TaskStatus.Failed, error });
     this.logger.warn({ error }, 'Marked as failed by queue');
   }
 
-  private async handleFailure(record: TaskRecord, err: unknown, options: RunOptions) {
+  private async handleFailure(task: AnalysisTask, err: unknown, options: RunOptions) {
     if (err instanceof DomainError && !err.retryable) {
       this.logger.warn({ error: err.message }, 'Failed');
-      await this.fail(record, err.message);
+      await this.fail(task, err.message);
       throw new TaskFailedError(err.message, { cause: err });
     }
 
@@ -104,17 +104,17 @@ export class CommentAnalyzer {
       this.logger.error({ err }, 'Failed on the final attempt');
       // Сообщения доменных ошибок показываются пользователю, остальное — внутренние детали
       const message = err instanceof DomainError ? err.message : 'Internal error';
-      await this.fail(record, message);
+      await this.fail(task, message);
       throw new TaskFailedError(message, { cause: err });
     }
 
     this.logger.warn({ err }, 'Attempt failed, will be retried');
-    await this.repository.save({ ...record, status: TaskStatus.Pending });
+    await this.repository.save({ ...task, status: TaskStatus.Pending });
     throw err;
   }
 
-  private async fail(record: TaskRecord, error: string): Promise<void> {
-    await this.repository.save({ ...record, status: TaskStatus.Failed, result: null, error });
+  private async fail(task: AnalysisTask, error: string): Promise<void> {
+    await this.repository.save({ ...task, status: TaskStatus.Failed, result: null, error });
   }
 
   private normalize(err: unknown, signal: AbortSignal | undefined): unknown {

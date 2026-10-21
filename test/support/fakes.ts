@@ -1,7 +1,7 @@
 import type { Comment, CommentClassification } from '../../src/analysis/domain/comment';
 import { Category } from '../../src/analysis/domain/category';
 import type { CommentClassifier, CommentSource, TaskQueue } from '../../src/analysis/domain/ports';
-import type { TaskRecord } from '../../src/analysis/domain/task-record';
+import type { AnalysisTask } from '../../src/analysis/domain/analysis-task';
 
 /*
  * Фейки портов: простые классы вместо моков, как в Python-версии.
@@ -41,16 +41,16 @@ export class FakeClassifier implements CommentClassifier {
 
 /** Замена TaskRepository (Redis) на Map — с тем же публичным интерфейсом. */
 export class InMemoryTaskRepository {
-  readonly records = new Map<string, TaskRecord>();
+  readonly tasks = new Map<string, AnalysisTask>();
 
-  save(record: TaskRecord): Promise<TaskRecord> {
-    const updated = { ...record, updatedAt: new Date() };
-    this.records.set(record.taskId, updated);
+  save(task: AnalysisTask): Promise<AnalysisTask> {
+    const updated = { ...task, updatedAt: new Date() };
+    this.tasks.set(task.id, updated);
     return Promise.resolve(updated);
   }
 
-  get(taskId: string): Promise<TaskRecord | null> {
-    return Promise.resolve(this.records.get(taskId) ?? null);
+  get(taskId: string): Promise<AnalysisTask | null> {
+    return Promise.resolve(this.tasks.get(taskId) ?? null);
   }
 }
 

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { createZodDto } from '../../common/validation/zod-dto';
 import { extractVideoId } from '../youtube-url';
 
-export const createAnalysisSchema = z
+export const analyzeRequestSchema = z
   .object({
     url: z.url({ protocol: /^https?$/, error: 'Input should be a valid URL' }),
   })
@@ -17,4 +17,4 @@ export const createAnalysisSchema = z
   });
 
 /** Тело `POST /api/v1/analysis`. Невалидная или не-YouTube ссылка → 422. */
-export class CreateAnalysisDto extends createZodDto(createAnalysisSchema) {}
+export class AnalyzeRequest extends createZodDto(analyzeRequestSchema) {}

@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { CommentAnalyzer, TaskFailedError } from '../../src/analysis/comment-analyzer.service';
 import { Category } from '../../src/analysis/domain/category';
 import { COMMENT_CLASSIFIER, COMMENT_SOURCE } from '../../src/analysis/domain/ports';
-import { newTaskRecord } from '../../src/analysis/domain/task-record';
+import { createAnalysisTask } from '../../src/analysis/domain/analysis-task';
 import { TaskStatus } from '../../src/analysis/domain/task-status';
 import { TaskRepository } from '../../src/analysis/task.repository';
 import { VideoNotFoundError, YoutubeUnavailableError } from '../../src/youtube/youtube.errors';
@@ -38,7 +38,7 @@ describe('CommentAnalyzer', () => {
       .compile();
     analyzer = moduleRef.get(CommentAnalyzer);
 
-    await repository.save(newTaskRecord(TASK_ID, 'dQw4w9WgXcQ'));
+    await repository.save(createAnalysisTask(TASK_ID, 'dQw4w9WgXcQ'));
   });
 
   const status = async () => repository.get(TASK_ID);
@@ -107,8 +107,8 @@ describe('CommentAnalyzer', () => {
   });
 
   it('skips an already finished task (repeated delivery)', async () => {
-    const record = await status();
-    await repository.save({ ...record!, status: TaskStatus.Completed, result: {} });
+    const task = await status();
+    await repository.save({ ...task!, status: TaskStatus.Completed, result: {} });
     source.error = new Error('must not be called');
 
     await analyzer.run(TASK_ID, { isFinalAttempt: false });

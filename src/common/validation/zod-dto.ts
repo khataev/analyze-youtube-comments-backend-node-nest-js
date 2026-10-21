@@ -2,7 +2,7 @@ import type { z } from 'zod';
 
 /**
  * Превращает zod-схему в класс-DTO. Класс нужен Nest: TypeScript-типы стираются при компиляции,
- * а класс остаётся в рантайме и попадает в метаданные параметра (`@Body() body: CreateAnalysisDto`).
+ * а класс остаётся в рантайме и попадает в метаданные параметра (`@Body() body: AnalyzeRequest`).
  * По этому классу ZodValidationPipe находит схему. Так же устроен createZodDto из nestjs-zod
  * (сам пакет пока не поддерживает Nest 12).
  *

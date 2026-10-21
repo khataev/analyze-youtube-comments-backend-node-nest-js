@@ -3,7 +3,11 @@ import type { Redis } from 'ioredis';
 import { StorageUnavailableError } from '../common/errors/domain.error';
 import { type AppConfig, appConfig } from '../config/app.config';
 import { REDIS_CLIENT } from '../redis/redis.constants';
-import { serializeTaskRecord, storedTaskRecordSchema, type TaskRecord } from './domain/task-record';
+import {
+  serializeAnalysisTask,
+  storedAnalysisTaskSchema,
+  type AnalysisTask,
+} from './domain/analysis-task';
 
 /**
  * Хранение статусов задач. Сервисы не знают, что внутри Redis: его можно заменить на БД,
@@ -22,17 +26,17 @@ export class TaskRepository {
     this.ttlSeconds = config.tasks.ttlSeconds;
   }
 
-  async save(record: TaskRecord): Promise<TaskRecord> {
-    const updated = { ...record, updatedAt: new Date() };
+  async save(task: AnalysisTask): Promise<AnalysisTask> {
+    const updated = { ...task, updatedAt: new Date() };
     await this.call(() =>
-      this.redis.set(this.key(record.taskId), serializeTaskRecord(updated), 'EX', this.ttlSeconds),
+      this.redis.set(this.key(task.id), serializeAnalysisTask(updated), 'EX', this.ttlSeconds),
     );
     return updated;
   }
 
-  async get(taskId: string): Promise<TaskRecord | null> {
+  async get(taskId: string): Promise<AnalysisTask | null> {
     const raw = await this.call(() => this.redis.get(this.key(taskId)));
-    return raw === null ? null : storedTaskRecordSchema.parse(JSON.parse(raw));
+    return raw === null ? null : storedAnalysisTaskSchema.parse(JSON.parse(raw));
   }
 
   private key(taskId: string): string {
