@@ -1,11 +1,11 @@
 import { afterAll, describe, expect, it } from 'vitest';
-import { analysisTasksTable } from '../../src/analysis/analysis-task.table';
-import { createAnalysisTask } from '../../src/analysis/domain/analysis-task';
-import { Category } from '../../src/analysis/domain/category';
-import { TaskStatus } from '../../src/analysis/domain/task-status';
-import { TaskRepository } from '../../src/analysis/task.repository';
-import { StorageUnavailableError } from '../../src/common/errors/domain.error';
-import { unreachableDatabase, useTestDatabase } from '../support/database';
+import { analysisTasksTable } from '@/analysis/analysis-task.table';
+import { createAnalysisTask } from '@/analysis/domain/analysis-task';
+import { Category } from '@/analysis/domain/category';
+import { TaskStatus } from '@/analysis/domain/task-status';
+import { TaskRepository } from '@/analysis/task.repository';
+import { StorageUnavailableError } from '@/common/errors/domain.error';
+import { unreachableDatabase, useTestDatabase } from '@test/support/database';
 
 const TASK_ID = '11111111-1111-4111-8111-111111111111';
 

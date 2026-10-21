@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { DomainError } from '../common/errors/domain.error';
+import { DomainError } from '@/common/errors/domain.error';
 import { AnalysisTimeoutError } from './domain/errors';
 import { groupByCategory } from './domain/group-by-category';
 import {

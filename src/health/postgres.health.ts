@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { HealthIndicatorService } from '@nestjs/terminus';
 import type { Pool } from 'pg';
-import { PG_POOL } from '../database/database.constants';
+import { PG_POOL } from '@/database/database.constants';
 
 /** Свой индикатор: готовые в terminus есть для TypeORM, Prisma и MikroORM, но не для Drizzle. */
 @Injectable()

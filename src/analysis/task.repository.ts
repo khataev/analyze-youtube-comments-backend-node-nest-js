@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq, sql } from 'drizzle-orm';
-import { StorageUnavailableError } from '../common/errors/domain.error';
-import { DATABASE, type Database } from '../database/database.constants';
-import { isConnectionError } from '../database/postgres';
+import { StorageUnavailableError } from '@/common/errors/domain.error';
+import { DATABASE, type Database } from '@/database/database.constants';
+import { isConnectionError } from '@/database/postgres';
 import { analysisTasksTable } from './analysis-task.table';
 import type { AnalysisTask } from './domain/analysis-task';
 

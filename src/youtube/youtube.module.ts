@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { COMMENT_SOURCE } from '../analysis/domain/ports';
+import { COMMENT_SOURCE } from '@/analysis/domain/ports';
 import { YoutubeClient } from './youtube.client';
 
 /**

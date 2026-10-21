@@ -1,9 +1,9 @@
 import { existsSync } from 'node:fs';
 import { pino } from 'pino';
-import { redactUrl } from '../common/redact-url';
-import { loadDatabaseConfig } from '../config/app.config';
-import { ENV_FILE } from '../config/env-file';
-import { basePinoOptions } from '../logging/pino-options';
+import { redactUrl } from '@/common/redact-url';
+import { loadDatabaseConfig } from '@/config/app.config';
+import { ENV_FILE } from '@/config/env-file';
+import { basePinoOptions } from '@/logging/pino-options';
 import { createDatabaseIfMissing, databaseName } from './create-database';
 import { runMigrations } from './migrate';
 import { describeError } from './postgres';

@@ -1,11 +1,11 @@
 import { APICallError } from 'ai';
 import { MockLanguageModelV4 } from 'ai/test';
 import { describe, expect, it } from 'vitest';
-import { Category } from '../../src/analysis/domain/category';
-import type { Comment } from '../../src/analysis/domain/comment';
-import { LlmCommentClassifier } from '../../src/llm/llm-comment-classifier';
-import { LlmError } from '../../src/llm/llm.errors';
-import { testConfig } from '../support/config';
+import { Category } from '@/analysis/domain/category';
+import type { Comment } from '@/analysis/domain/comment';
+import { LlmCommentClassifier } from '@/llm/llm-comment-classifier';
+import { LlmError } from '@/llm/llm.errors';
+import { testConfig } from '@test/support/config';
 
 type GenerateOptions = Parameters<MockLanguageModelV4['doGenerate']>[0];
 

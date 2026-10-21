@@ -1,12 +1,12 @@
 import { Test } from '@nestjs/testing';
 import { type Job, UnrecoverableError } from 'bullmq';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CommentAnalyzer, TaskFailedError } from '../../src/analysis/comment-analyzer.service';
-import { AnalysisProcessor } from '../../src/analysis/queue/analysis.processor';
-import type { AnalyzeVideoJobData } from '../../src/analysis/queue/analyze-video.job';
-import { appConfig } from '../../src/config/app.config';
-import { testConfig } from '../support/config';
-import { silentLoggerModule } from '../support/logging';
+import { CommentAnalyzer, TaskFailedError } from '@/analysis/comment-analyzer.service';
+import { AnalysisProcessor } from '@/analysis/queue/analysis.processor';
+import type { AnalyzeVideoJobData } from '@/analysis/queue/analyze-video.job';
+import { appConfig } from '@/config/app.config';
+import { testConfig } from '@test/support/config';
+import { silentLoggerModule } from '@test/support/logging';
 
 const TASK_ID = '11111111-1111-4111-8111-111111111111';
 

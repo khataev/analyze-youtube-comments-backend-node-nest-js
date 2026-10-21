@@ -1,14 +1,14 @@
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { AnalysisService } from '../../src/analysis/analysis.service';
-import { TaskNotFoundError } from '../../src/analysis/domain/errors';
-import { TASK_QUEUE } from '../../src/analysis/domain/ports';
-import { TaskStatus } from '../../src/analysis/domain/task-status';
-import { TaskRepository } from '../../src/analysis/task.repository';
-import { StorageUnavailableError } from '../../src/common/errors/domain.error';
-import { analysisTasksTable } from '../../src/analysis/analysis-task.table';
-import { FakeQueue } from '../support/fakes';
-import { useTestDatabase } from '../support/database';
+import { AnalysisService } from '@/analysis/analysis.service';
+import { TaskNotFoundError } from '@/analysis/domain/errors';
+import { TASK_QUEUE } from '@/analysis/domain/ports';
+import { TaskStatus } from '@/analysis/domain/task-status';
+import { TaskRepository } from '@/analysis/task.repository';
+import { StorageUnavailableError } from '@/common/errors/domain.error';
+import { analysisTasksTable } from '@/analysis/analysis-task.table';
+import { FakeQueue } from '@test/support/fakes';
+import { useTestDatabase } from '@test/support/database';
 
 describe('AnalysisService', () => {
   const db = useTestDatabase();

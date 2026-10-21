@@ -7,9 +7,9 @@ import {
 } from '@nestjs/common';
 import { type Job, UnrecoverableError } from 'bullmq';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
-import { type AppConfig, appConfig } from '../../config/app.config';
-import { ANALYSIS_QUEUE } from '../../queue/queue.constants';
-import { CommentAnalyzer, TaskFailedError } from '../comment-analyzer.service';
+import { type AppConfig, appConfig } from '@/config/app.config';
+import { ANALYSIS_QUEUE } from '@/queue/queue.constants';
+import { CommentAnalyzer, TaskFailedError } from '@/analysis/comment-analyzer.service';
 import {
   ANALYZE_VIDEO_ATTEMPTS,
   ANALYZE_VIDEO_TIMEOUT_MS,

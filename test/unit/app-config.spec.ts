@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { loadAppConfig, loadDatabaseConfig } from '../../src/config/app.config';
+import { loadAppConfig, loadDatabaseConfig } from '@/config/app.config';
 
 describe('loadAppConfig', () => {
   it('applies defaults compatible with the Python version', () => {

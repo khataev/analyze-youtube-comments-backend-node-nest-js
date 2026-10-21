@@ -7,7 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { Response } from 'express';
-import { DomainError, NotFoundError, StorageUnavailableError } from '../errors/domain.error';
+import { DomainError, NotFoundError, StorageUnavailableError } from '@/common/errors/domain.error';
 
 /**
  * Глобальный exception filter — аналог `rescue_from` в Rails или `add_exception_handler` в FastAPI.

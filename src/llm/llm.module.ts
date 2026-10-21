@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { COMMENT_CLASSIFIER } from '../analysis/domain/ports';
-import { type AppConfig, appConfig } from '../config/app.config';
+import { COMMENT_CLASSIFIER } from '@/analysis/domain/ports';
+import { type AppConfig, appConfig } from '@/config/app.config';
 import { createLanguageModel, LANGUAGE_MODEL } from './language-model.factory';
 import { LlmCommentClassifier } from './llm-comment-classifier';
 

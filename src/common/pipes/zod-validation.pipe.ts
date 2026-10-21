@@ -4,7 +4,7 @@ import {
   type PipeTransform,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { isZodDto } from '../validation/zod-dto';
+import { isZodDto } from '@/common/validation/zod-dto';
 
 /**
  * Pipe — это шаг между HTTP-запросом и аргументом метода контроллера: он валидирует

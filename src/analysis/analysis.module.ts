@@ -1,8 +1,8 @@
 import { BullModule } from '@nestjs/bullmq';
 import { type DynamicModule, Module } from '@nestjs/common';
-import { LlmModule } from '../llm/llm.module';
-import { ANALYSIS_QUEUE } from '../queue/queue.constants';
-import { YoutubeModule } from '../youtube/youtube.module';
+import { LlmModule } from '@/llm/llm.module';
+import { ANALYSIS_QUEUE } from '@/queue/queue.constants';
+import { YoutubeModule } from '@/youtube/youtube.module';
 import { AnalysisController } from './analysis.controller';
 import { AnalysisService } from './analysis.service';
 import { CommentAnalyzer } from './comment-analyzer.service';

@@ -6,9 +6,9 @@ import {
   type Comment,
   type CommentClassification,
   commentClassificationSchema,
-} from '../analysis/domain/comment';
-import type { CallOptions, CommentClassifier } from '../analysis/domain/ports';
-import { type AppConfig, appConfig } from '../config/app.config';
+} from '@/analysis/domain/comment';
+import type { CallOptions, CommentClassifier } from '@/analysis/domain/ports';
+import { type AppConfig, appConfig } from '@/config/app.config';
 import { LANGUAGE_MODEL } from './language-model.factory';
 import { LlmError } from './llm.errors';
 import { INSTRUCTIONS } from './prompt';

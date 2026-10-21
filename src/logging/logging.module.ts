@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { LoggerModule } from 'nestjs-pino';
-import { type AppConfig, appConfig } from '../config/app.config';
+import { type AppConfig, appConfig } from '@/config/app.config';
 import { basePinoOptions } from './pino-options';
 
 /**

@@ -1,7 +1,7 @@
 import { Global, Inject, Logger, Module, type OnApplicationShutdown } from '@nestjs/common';
 import { Redis } from 'ioredis';
-import { type AppConfig, appConfig } from '../config/app.config';
-import { redactUrl } from '../common/redact-url';
+import { type AppConfig, appConfig } from '@/config/app.config';
+import { redactUrl } from '@/common/redact-url';
 import { REDIS_CLIENT } from './redis.constants';
 
 const logger = new Logger('Redis');

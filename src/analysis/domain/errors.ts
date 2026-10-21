@@ -1,4 +1,4 @@
-import { DomainError, NotFoundError } from '../../common/errors/domain.error';
+import { DomainError, NotFoundError } from '@/common/errors/domain.error';
 
 export class TaskNotFoundError extends NotFoundError {
   constructor() {

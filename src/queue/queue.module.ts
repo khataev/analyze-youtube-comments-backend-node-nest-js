@@ -1,6 +1,6 @@
 import { BullModule } from '@nestjs/bullmq';
 import { type DynamicModule, Module } from '@nestjs/common';
-import { type AppConfig, appConfig } from '../config/app.config';
+import { type AppConfig, appConfig } from '@/config/app.config';
 
 export type QueueRole = 'producer' | 'worker';
 

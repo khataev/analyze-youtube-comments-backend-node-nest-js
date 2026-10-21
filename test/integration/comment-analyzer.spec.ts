@@ -1,15 +1,15 @@
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { CommentAnalyzer, TaskFailedError } from '../../src/analysis/comment-analyzer.service';
-import { Category } from '../../src/analysis/domain/category';
-import { COMMENT_CLASSIFIER, COMMENT_SOURCE } from '../../src/analysis/domain/ports';
-import { createAnalysisTask } from '../../src/analysis/domain/analysis-task';
-import { TaskStatus } from '../../src/analysis/domain/task-status';
-import { TaskRepository } from '../../src/analysis/task.repository';
-import { VideoNotFoundError, YoutubeUnavailableError } from '../../src/youtube/youtube.errors';
-import { useTestDatabase } from '../support/database';
-import { FakeClassifier, FakeSource } from '../support/fakes';
-import { quietLogger } from '../support/logging';
+import { CommentAnalyzer, TaskFailedError } from '@/analysis/comment-analyzer.service';
+import { Category } from '@/analysis/domain/category';
+import { COMMENT_CLASSIFIER, COMMENT_SOURCE } from '@/analysis/domain/ports';
+import { createAnalysisTask } from '@/analysis/domain/analysis-task';
+import { TaskStatus } from '@/analysis/domain/task-status';
+import { TaskRepository } from '@/analysis/task.repository';
+import { VideoNotFoundError, YoutubeUnavailableError } from '@/youtube/youtube.errors';
+import { useTestDatabase } from '@test/support/database';
+import { FakeClassifier, FakeSource } from '@test/support/fakes';
+import { quietLogger } from '@test/support/logging';
 
 const TASK_ID = '11111111-1111-4111-8111-111111111111';
 

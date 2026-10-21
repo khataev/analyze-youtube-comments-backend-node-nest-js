@@ -18,6 +18,14 @@ export default tseslint.config(
       // Классы модулей Nest пустые по определению: всё описано в декораторе @Module
       '@typescript-eslint/no-extraneous-class': 'off',
       '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
+      // Выше по дереву — только через алиасы @/ и @test/ (tsconfig.json). Соседние файлы
+      // модуля импортируются через './': при переносе папки целиком эти импорты не меняются
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [{ group: ['../*'], message: "Use the @/ or @test/ alias instead of '../'." }],
+        },
+      ],
     },
   },
   {

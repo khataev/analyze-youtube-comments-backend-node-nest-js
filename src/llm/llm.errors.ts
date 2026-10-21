@@ -1,4 +1,4 @@
-import { DomainError } from '../common/errors/domain.error';
+import { DomainError } from '@/common/errors/domain.error';
 
 export class LlmError extends DomainError {
   override readonly retryable: boolean;

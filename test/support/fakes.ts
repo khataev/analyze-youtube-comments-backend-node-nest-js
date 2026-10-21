@@ -1,6 +1,6 @@
-import type { Comment, CommentClassification } from '../../src/analysis/domain/comment';
-import { Category } from '../../src/analysis/domain/category';
-import type { CommentClassifier, CommentSource, TaskQueue } from '../../src/analysis/domain/ports';
+import type { Comment, CommentClassification } from '@/analysis/domain/comment';
+import { Category } from '@/analysis/domain/category';
+import type { CommentClassifier, CommentSource, TaskQueue } from '@/analysis/domain/ports';
 
 /*
  * Фейки портов: простые классы вместо моков, как в Python-версии.

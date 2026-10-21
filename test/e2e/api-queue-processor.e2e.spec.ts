@@ -2,18 +2,18 @@ import { Test } from '@nestjs/testing';
 import type { Job } from 'bullmq';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
-import { CommentAnalyzer } from '../../src/analysis/comment-analyzer.service';
-import { Category } from '../../src/analysis/domain/category';
-import { COMMENT_CLASSIFIER, COMMENT_SOURCE } from '../../src/analysis/domain/ports';
-import { AnalysisProcessor } from '../../src/analysis/queue/analysis.processor';
-import type { AnalyzeVideoJobData } from '../../src/analysis/queue/analyze-video.job';
-import { TaskRepository } from '../../src/analysis/task.repository';
-import { appConfig } from '../../src/config/app.config';
-import { createApiApp } from '../support/api-app';
-import { useTestDatabase } from '../support/database';
-import { testConfig } from '../support/config';
-import { FakeClassifier, FakeSource } from '../support/fakes';
-import { silentLoggerModule } from '../support/logging';
+import { CommentAnalyzer } from '@/analysis/comment-analyzer.service';
+import { Category } from '@/analysis/domain/category';
+import { COMMENT_CLASSIFIER, COMMENT_SOURCE } from '@/analysis/domain/ports';
+import { AnalysisProcessor } from '@/analysis/queue/analysis.processor';
+import type { AnalyzeVideoJobData } from '@/analysis/queue/analyze-video.job';
+import { TaskRepository } from '@/analysis/task.repository';
+import { appConfig } from '@/config/app.config';
+import { createApiApp } from '@test/support/api-app';
+import { useTestDatabase } from '@test/support/database';
+import { testConfig } from '@test/support/config';
+import { FakeClassifier, FakeSource } from '@test/support/fakes';
+import { silentLoggerModule } from '@test/support/logging';
 
 /**
  * Путь «API → очередь → процессор» без Redis, хранилище — тестовая база Postgres. Связующее звено — аргументы queue.add():

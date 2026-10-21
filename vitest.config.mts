@@ -2,6 +2,8 @@ import swc from 'unplugin-swc';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  // Алиасы @/ и @test/ из tsconfig.json
+  resolve: { tsconfigPaths: true },
   test: {
     include: ['test/**/*.spec.ts'],
     environment: 'node',

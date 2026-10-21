@@ -1,9 +1,9 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, Logger } from '@nestjs/common';
 import type { Queue } from 'bullmq';
-import { StorageUnavailableError } from '../../common/errors/domain.error';
-import { ANALYSIS_QUEUE } from '../../queue/queue.constants';
-import type { TaskQueue } from '../domain/ports';
+import { StorageUnavailableError } from '@/common/errors/domain.error';
+import { ANALYSIS_QUEUE } from '@/queue/queue.constants';
+import type { TaskQueue } from '@/analysis/domain/ports';
 import {
   ANALYZE_VIDEO_ATTEMPTS,
   ANALYZE_VIDEO_JOB,

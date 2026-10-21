@@ -1,8 +1,8 @@
 import { Global, Inject, Logger, Module, type OnApplicationShutdown } from '@nestjs/common';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import type { Pool } from 'pg';
-import { redactUrl } from '../common/redact-url';
-import { type AppConfig, appConfig } from '../config/app.config';
+import { redactUrl } from '@/common/redact-url';
+import { type AppConfig, appConfig } from '@/config/app.config';
 import { DATABASE, PG_POOL } from './database.constants';
 import { createPool, describeError } from './postgres';
 

@@ -1,4 +1,4 @@
-import { DomainError } from '../common/errors/domain.error';
+import { DomainError } from '@/common/errors/domain.error';
 
 /** Сообщения этих ошибок показываются пользователю в поле `error` задачи. */
 export class YoutubeError extends DomainError {}

@@ -1,4 +1,4 @@
-import { CATEGORIES } from '../analysis/domain/category';
+import { CATEGORIES } from '@/analysis/domain/category';
 
 export const INSTRUCTIONS = `
 You are a YouTube comment classifier.

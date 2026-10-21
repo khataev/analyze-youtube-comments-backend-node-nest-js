@@ -97,6 +97,13 @@ test/
 └── e2e/                       # HTTP API через supertest; путь API → очередь → процессор
 ```
 
+Имена файлов — kebab-case с ролью через точку (`analysis.service.ts`, `analyze-request.dto.ts`),
+как генерирует Nest CLI. Импорты выше по дереву — через алиасы из `tsconfig.json`:
+`@/config/app.config` (это `src/`) и `@test/support/fakes`. Соседние файлы модуля — через `./`,
+чтобы при переносе папки целиком эти импорты не менялись. `../` запрещён правилом ESLint.
+`nest build` переписывает алиасы в относительные пути, Vitest читает их из `tsconfig.json`
+(`resolve.tsconfigPaths`).
+
 ### Зависимости
 
 ```

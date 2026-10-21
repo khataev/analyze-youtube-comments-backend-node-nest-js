@@ -1,9 +1,9 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import pRetry from 'p-retry';
 import { z } from 'zod';
-import type { Comment } from '../analysis/domain/comment';
-import type { CallOptions, CommentSource } from '../analysis/domain/ports';
-import { type AppConfig, appConfig } from '../config/app.config';
+import type { Comment } from '@/analysis/domain/comment';
+import type { CallOptions, CommentSource } from '@/analysis/domain/ports';
+import { type AppConfig, appConfig } from '@/config/app.config';
 import {
   CommentsUnavailableError,
   VideoNotFoundError,

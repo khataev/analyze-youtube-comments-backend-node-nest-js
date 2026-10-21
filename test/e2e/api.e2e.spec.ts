@@ -1,13 +1,13 @@
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { afterAll, afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { Category } from '../../src/analysis/domain/category';
-import { createAnalysisTask } from '../../src/analysis/domain/analysis-task';
-import { TaskStatus } from '../../src/analysis/domain/task-status';
-import { TaskRepository } from '../../src/analysis/task.repository';
-import { createApiApp } from '../support/api-app';
-import { unreachableDatabase, useTestDatabase } from '../support/database';
-import { fakeRedis } from '../support/fakes';
+import { Category } from '@/analysis/domain/category';
+import { createAnalysisTask } from '@/analysis/domain/analysis-task';
+import { TaskStatus } from '@/analysis/domain/task-status';
+import { TaskRepository } from '@/analysis/task.repository';
+import { createApiApp } from '@test/support/api-app';
+import { unreachableDatabase, useTestDatabase } from '@test/support/database';
+import { fakeRedis } from '@test/support/fakes';
 
 const VIDEO_URL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
 const UNKNOWN_ID = '00000000-0000-4000-8000-000000000000';

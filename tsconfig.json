@@ -21,7 +21,13 @@
     "sourceMap": true,
     "incremental": true,
     "outDir": "./dist",
-    "rootDir": "."
+    "rootDir": ".",
+    // Абсолютные импорты вместо '../../': @/config/app.config → src/config/app.config.
+    // nest build переписывает алиасы в относительные пути, Vitest читает их из этого файла
+    "paths": {
+      "@/*": ["./src/*"],
+      "@test/*": ["./test/*"]
+    }
   },
   "include": ["src", "test", "vitest.config.mts", "drizzle.config.ts"]
 }

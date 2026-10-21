@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { HealthIndicatorService } from '@nestjs/terminus';
 import type { Redis } from 'ioredis';
-import { REDIS_CLIENT } from '../redis/redis.constants';
+import { REDIS_CLIENT } from '@/redis/redis.constants';
 
 /** Свой индикатор для terminus: готовых для ioredis в нём нет. */
 @Injectable()

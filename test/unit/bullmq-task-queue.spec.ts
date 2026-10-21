@@ -5,10 +5,10 @@ import {
   ANALYZE_VIDEO_JOB,
   ANALYZE_VIDEO_KEEP_COMPLETED,
   ANALYZE_VIDEO_KEEP_FAILED,
-} from '../../src/analysis/queue/analyze-video.job';
-import { BullMqTaskQueue } from '../../src/analysis/queue/bullmq-task-queue';
-import { StorageUnavailableError } from '../../src/common/errors/domain.error';
-import { ANALYSIS_QUEUE } from '../../src/queue/queue.constants';
+} from '@/analysis/queue/analyze-video.job';
+import { BullMqTaskQueue } from '@/analysis/queue/bullmq-task-queue';
+import { StorageUnavailableError } from '@/common/errors/domain.error';
+import { ANALYSIS_QUEUE } from '@/queue/queue.constants';
 
 const TASK_ID = '11111111-1111-4111-8111-111111111111';
 

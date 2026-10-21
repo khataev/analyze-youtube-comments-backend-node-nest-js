@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { createZodDto } from '../../common/validation/zod-dto';
-import { extractVideoId } from '../youtube-url';
+import { createZodDto } from '@/common/validation/zod-dto';
+import { extractVideoId } from '@/analysis/youtube-url';
 
 export const analyzeRequestSchema = z
   .object({

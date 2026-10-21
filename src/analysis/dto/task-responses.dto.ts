@@ -1,6 +1,6 @@
-import type { AnalysisTask } from '../domain/analysis-task';
-import type { Category } from '../domain/category';
-import type { TaskStatus } from '../domain/task-status';
+import type { AnalysisTask } from '@/analysis/domain/analysis-task';
+import type { Category } from '@/analysis/domain/category';
+import type { TaskStatus } from '@/analysis/domain/task-status';
 
 /*
  * Ответы API. Поля в snake_case — это контракт с общим фронтендом (как в Python-версии),
