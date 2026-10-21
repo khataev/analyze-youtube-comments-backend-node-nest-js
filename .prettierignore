@@ -1,3 +1,5 @@
 dist
 coverage
 package-lock.json
+# Генерирует drizzle-kit, правится только им
+drizzle
