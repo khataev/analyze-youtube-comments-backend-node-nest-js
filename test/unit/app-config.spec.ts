@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { loadAppConfig } from '../../src/config/app.config';
+import { loadAppConfig, loadDatabaseConfig } from '../../src/config/app.config';
 
 describe('loadAppConfig', () => {
   it('applies defaults compatible with the Python version', () => {
@@ -9,7 +9,8 @@ describe('loadAppConfig', () => {
       port: 8000,
       logLevel: 'info',
       corsOrigins: ['http://localhost:5173'],
-      redis: { url: 'redis://localhost:6379/0' },
+      database: { url: 'postgres://app:app@localhost:5432/analysis_node' },
+      redis: { url: 'redis://localhost:6379/2' },
       youtube: { apiKey: 'key', maxComments: 200 },
       llm: { model: 'deepseek:deepseek-chat', apiKey: undefined, batchSize: 50, concurrency: 4 },
       tasks: { ttlSeconds: 86_400 },
@@ -38,5 +39,12 @@ describe('loadAppConfig', () => {
     expect(() => loadAppConfig({ YOUTUBE_API_KEY: 'key', LLM_MODEL: 'gpt' })).toThrow(
       /provider:model/,
     );
+  });
+
+  it('loads database settings without YouTube and LLM keys', () => {
+    const config = loadDatabaseConfig({ DATABASE_URL: 'postgresql://u:p@db:5432/x' });
+
+    expect(config).toEqual({ logLevel: 'info', database: { url: 'postgresql://u:p@db:5432/x' } });
+    expect(() => loadDatabaseConfig({ DATABASE_URL: 'mysql://x' })).toThrow(/DATABASE_URL/);
   });
 });

@@ -1,14 +1,7 @@
-import { resolve } from 'node:path';
 import { Module } from '@nestjs/common';
 import { ConfigModule as NestConfigModule } from '@nestjs/config';
 import { appConfig } from './app.config';
-
-/**
- * .env ищется относительно этого файла, а не текущего каталога: и src/config, и dist/config
- * лежат на два уровня ниже корня проекта. Поэтому `npm run start:worker` работает
- * из любого каталога (в Python-версии `.env` находился только при запуске из корня).
- */
-const ENV_FILE = resolve(__dirname, '..', '..', '.env');
+import { ENV_FILE } from './env-file';
 
 @Module({
   imports: [

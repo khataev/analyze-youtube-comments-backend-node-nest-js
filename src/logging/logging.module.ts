@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { LoggerModule } from 'nestjs-pino';
 import { type AppConfig, appConfig } from '../config/app.config';
+import { basePinoOptions } from './pino-options';
 
 /**
  * Структурированные логи через pino. После `app.useLogger(app.get(Logger))` в main-файлах
@@ -13,12 +14,7 @@ import { type AppConfig, appConfig } from '../config/app.config';
       inject: [appConfig.KEY],
       useFactory: (config: AppConfig) => ({
         pinoHttp: {
-          level: config.logLevel,
-          // В терминале — читаемый вывод, в Docker и проде — JSON по строке на событие
-          transport:
-            process.stdout.isTTY && process.env.NODE_ENV !== 'production'
-              ? { target: 'pino-pretty', options: { singleLine: true, ignore: 'pid,hostname' } }
-              : undefined,
+          ...basePinoOptions(config.logLevel),
           redact: [
             'req.headers.authorization',
             'req.headers.cookie',

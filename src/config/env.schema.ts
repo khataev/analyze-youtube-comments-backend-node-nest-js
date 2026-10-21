@@ -1,16 +1,39 @@
 import { z } from 'zod';
 
-/**
- * Схема переменных окружения. Имена и значения по умолчанию совпадают с Python-версией
- * (см. .env.example), чтобы один .env подходил обеим реализациям.
+/*
+ * Схемы переменных окружения. Имена и значения по умолчанию совпадают с Python-версией
+ * (см. .env.example), кроме адресов: у каждой реализации своя база Postgres и номер БД Redis.
  *
  * Аналог pydantic-settings: строки из окружения приводятся к типам, при ошибке
  * процесс падает на старте с перечнем проблем (см. loadAppConfig).
  */
-export const envSchema = z.object({
+
+/**
+ * Минимум для команд БД (создание базы, миграции): им не нужны ключи YouTube и LLM.
+ * Аналог отдельных DatabaseSettings в Python-версии.
+ */
+export const databaseEnvSchema = z.object({
+  // Формат node-postgres; в Python-версии тот же адрес записан как postgresql+asyncpg://
+  DATABASE_URL: z
+    .string()
+    .default('postgres://app:app@localhost:5432/analysis_node')
+    .refine(
+      (value) => /^postgres(ql)?:\/\//.test(value),
+      'must start with postgres:// or postgresql://',
+    ),
+  LOG_LEVEL: z
+    .string()
+    .default('INFO')
+    .transform((value) => value.toLowerCase())
+    .pipe(z.enum(['trace', 'debug', 'info', 'warn', 'warning', 'error', 'fatal', 'silent']))
+    .transform((value) => (value === 'warning' ? 'warn' : value)),
+});
+
+/** Полная схема для API и воркера. */
+export const envSchema = databaseEnvSchema.extend({
   REDIS_URL: z
     .string()
-    .default('redis://localhost:6379/0')
+    .default('redis://localhost:6379/2')
     .refine((value) => /^rediss?:\/\//.test(value), 'must start with redis:// or rediss://'),
   CORS_ORIGINS: z
     .string()
@@ -24,12 +47,6 @@ export const envSchema = z.object({
         return z.NEVER;
       }
     }),
-  LOG_LEVEL: z
-    .string()
-    .default('INFO')
-    .transform((value) => value.toLowerCase())
-    .pipe(z.enum(['trace', 'debug', 'info', 'warn', 'warning', 'error', 'fatal', 'silent']))
-    .transform((value) => (value === 'warning' ? 'warn' : value)),
 
   YOUTUBE_API_KEY: z.string().min(1, 'is required'),
   YOUTUBE_MAX_COMMENTS: z.coerce.number().int().positive().default(200),
@@ -54,5 +71,3 @@ export const envSchema = z.object({
   WORKER_CONCURRENCY: z.coerce.number().int().positive().default(2),
   PORT: z.coerce.number().int().min(1).max(65535).default(8000),
 });
-
-export type Env = z.output<typeof envSchema>;

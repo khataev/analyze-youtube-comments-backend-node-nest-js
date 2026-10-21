@@ -1,22 +1,18 @@
 import { type ConfigType, registerAs } from '@nestjs/config';
 import { z } from 'zod';
-import { envSchema } from './env.schema';
+import { databaseEnvSchema, envSchema } from './env.schema';
 
 /**
  * Разбирает окружение и раскладывает его по группам с camelCase-именами.
  * Код приложения работает только с этим объектом, а не с process.env.
  */
-export function loadAppConfig(env: Record<string, string | undefined>) {
-  const parsed = envSchema.safeParse(env);
-  if (!parsed.success) {
-    // Исключение на этапе инициализации модулей роняет процесс: лучше сразу, чем на первом запросе
-    throw new Error(`Invalid environment configuration:\n${z.prettifyError(parsed.error)}`);
-  }
-  const e = parsed.data;
+export function loadAppConfig(env: Environment) {
+  const e = parseEnv(envSchema, env);
   return {
     port: e.PORT,
     logLevel: e.LOG_LEVEL,
     corsOrigins: e.CORS_ORIGINS,
+    database: { url: e.DATABASE_URL },
     redis: { url: e.REDIS_URL },
     youtube: { apiKey: e.YOUTUBE_API_KEY, maxComments: e.YOUTUBE_MAX_COMMENTS },
     llm: {
@@ -28,6 +24,25 @@ export function loadAppConfig(env: Record<string, string | undefined>) {
     tasks: { ttlSeconds: e.TASK_TTL_SECONDS },
     worker: { concurrency: e.WORKER_CONCURRENCY },
   };
+}
+
+/** Настройки команд БД (создание базы, миграции): только адрес базы и уровень логов. */
+export function loadDatabaseConfig(env: Environment) {
+  const e = parseEnv(databaseEnvSchema, env);
+  return { logLevel: e.LOG_LEVEL, database: { url: e.DATABASE_URL } };
+}
+
+export type DatabaseConfig = ReturnType<typeof loadDatabaseConfig>;
+
+type Environment = Record<string, string | undefined>;
+
+function parseEnv<T extends z.ZodType>(schema: T, env: Environment): z.output<T> {
+  const parsed = schema.safeParse(env);
+  if (!parsed.success) {
+    // Исключение на этапе инициализации модулей роняет процесс: лучше сразу, чем на первом запросе
+    throw new Error(`Invalid environment configuration:\n${z.prettifyError(parsed.error)}`);
+  }
+  return parsed.data;
 }
 
 /**
