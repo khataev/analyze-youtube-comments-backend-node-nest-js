@@ -1,9 +1,9 @@
 import { afterAll, describe, expect, it } from 'vitest';
-import { analysisTasksTable } from '@/analysis/analysis-task.table';
-import { createAnalysisTask } from '@/analysis/domain/analysis-task';
-import { Category } from '@/analysis/domain/category';
-import { TaskStatus } from '@/analysis/domain/task-status';
-import { TaskRepository } from '@/analysis/task.repository';
+import { analysisTasksTable } from '@/modules/analysis/analysis-task.table';
+import { createAnalysisTask } from '@/modules/analysis/domain/analysis-task';
+import { Category } from '@/modules/analysis/domain/category';
+import { TaskStatus } from '@/modules/analysis/domain/task-status';
+import { TaskRepository } from '@/modules/analysis/task.repository';
 import { StorageUnavailableError } from '@/common/errors/domain.error';
 import { unreachableDatabase, useTestDatabase } from '@test/support/database';
 

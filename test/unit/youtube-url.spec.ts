@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { extractVideoId } from '@/analysis/youtube-url';
+import { extractVideoId } from '@/modules/analysis/youtube-url';
 
 const ID = 'dQw4w9WgXcQ';
 

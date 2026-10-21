@@ -1,10 +1,10 @@
 import { Test } from '@nestjs/testing';
 import { type Job, UnrecoverableError } from 'bullmq';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CommentAnalyzer, TaskFailedError } from '@/analysis/comment-analyzer.service';
-import { AnalysisProcessor } from '@/analysis/queue/analysis.processor';
-import type { AnalyzeVideoJobData } from '@/analysis/queue/analyze-video.job';
-import { appConfig } from '@/config/app.config';
+import { CommentAnalyzer, TaskFailedError } from '@/modules/analysis/comment-analyzer.service';
+import { AnalysisProcessor } from '@/modules/analysis/queue/analysis.processor';
+import type { AnalyzeVideoJobData } from '@/modules/analysis/queue/analyze-video.job';
+import { appConfig } from '@/core/config/app.config';
 import { testConfig } from '@test/support/config';
 import { silentLoggerModule } from '@test/support/logging';
 

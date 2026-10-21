@@ -3,10 +3,10 @@ import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { vi } from 'vitest';
 import { ApiModule } from '@/api.module';
-import { appConfig } from '@/config/app.config';
-import { DATABASE, type Database, PG_POOL } from '@/database/database.constants';
-import { ANALYSIS_QUEUE } from '@/queue/queue.constants';
-import { REDIS_CLIENT } from '@/redis/redis.constants';
+import { appConfig } from '@/core/config/app.config';
+import { DATABASE, type Database, PG_POOL } from '@/core/database/database.constants';
+import { ANALYSIS_QUEUE } from '@/core/queue/queue.constants';
+import { REDIS_CLIENT } from '@/core/redis/redis.constants';
 import { testConfig } from './config';
 import { fakeRedis } from './fakes';
 

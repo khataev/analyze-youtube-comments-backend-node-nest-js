@@ -1,7 +1,7 @@
 import { Client } from 'pg';
-import { createDatabaseIfMissing } from '@/database/create-database';
-import { runMigrations } from '@/database/migrate';
-import { describeError, isConnectionError } from '@/database/postgres';
+import { createDatabaseIfMissing } from '@/core/database/create-database';
+import { runMigrations } from '@/core/database/migrate';
+import { describeError, isConnectionError } from '@/core/database/postgres';
 import { TEST_DATABASE_URL } from './support/test-database-url';
 
 /**

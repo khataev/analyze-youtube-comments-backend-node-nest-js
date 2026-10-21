@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
-import type { Database } from '@/database/database.constants';
+import type { Database } from '@/core/database/database.constants';
 import { TEST_DATABASE_URL } from './test-database-url';
 
 class RollbackTestTransaction extends Error {}

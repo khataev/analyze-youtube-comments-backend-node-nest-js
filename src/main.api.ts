@@ -3,8 +3,8 @@ import { NestFactory } from '@nestjs/core';
 import { Logger } from 'nestjs-pino';
 import { ApiModule } from './api.module';
 import { redactUrl } from './common/redact-url';
-import { type AppConfig, appConfig } from './config/app.config';
-import { ANALYSIS_QUEUE } from './queue/queue.constants';
+import { type AppConfig, appConfig } from './core/config/app.config';
+import { ANALYSIS_QUEUE } from './core/queue/queue.constants';
 
 async function bootstrap(): Promise<void> {
   // bufferLogs: логи, написанные до useLogger(), не уходят в стандартный логгер, а ждут pino

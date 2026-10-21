@@ -1,4 +1,4 @@
-import { type AppConfig, loadAppConfig } from '@/config/app.config';
+import { type AppConfig, loadAppConfig } from '@/core/config/app.config';
 import { TEST_DATABASE_URL } from './test-database-url';
 
 /** Конфигурация для тестов: тот же разбор, что в приложении, без .env и process.env. */

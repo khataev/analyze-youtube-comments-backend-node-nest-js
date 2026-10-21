@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
-import { AnalysisModule } from './analysis/analysis.module';
+import { AnalysisModule } from './modules/analysis/analysis.module';
 import { DomainExceptionFilter } from './common/filters/domain-exception.filter';
 import { ZodValidationPipe } from './common/pipes/zod-validation.pipe';
-import { ConfigModule } from './config/config.module';
-import { DatabaseModule } from './database/database.module';
-import { HealthModule } from './health/health.module';
-import { LoggingModule } from './logging/logging.module';
-import { QueueModule } from './queue/queue.module';
-import { RedisModule } from './redis/redis.module';
+import { ConfigModule } from './core/config/config.module';
+import { DatabaseModule } from './core/database/database.module';
+import { HealthModule } from './core/health/health.module';
+import { LoggingModule } from './core/logging/logging.module';
+import { QueueModule } from './core/queue/queue.module';
+import { RedisModule } from './core/redis/redis.module';
 
 /**
  * Корневой модуль HTTP-процесса. Глобальные pipe и filter регистрируются как провайдеры

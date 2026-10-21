@@ -2,8 +2,8 @@ import { Logger as NestLogger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { Logger } from 'nestjs-pino';
 import { redactUrl } from './common/redact-url';
-import { type AppConfig, appConfig } from './config/app.config';
-import { ANALYSIS_QUEUE } from './queue/queue.constants';
+import { type AppConfig, appConfig } from './core/config/app.config';
+import { ANALYSIS_QUEUE } from './core/queue/queue.constants';
 import { WorkerModule } from './worker.module';
 
 /**

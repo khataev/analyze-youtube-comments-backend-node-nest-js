@@ -22,7 +22,7 @@
     "incremental": true,
     "outDir": "./dist",
     "rootDir": ".",
-    // Абсолютные импорты вместо '../../': @/config/app.config → src/config/app.config.
+    // Абсолютные импорты вместо '../../': @/core/config/app.config → src/core/config/app.config.
     // nest build переписывает алиасы в относительные пути, Vitest читает их из этого файла
     "paths": {
       "@/*": ["./src/*"],

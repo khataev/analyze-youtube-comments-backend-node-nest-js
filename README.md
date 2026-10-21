@@ -32,74 +32,81 @@ Redis и Postgres общие для всех реализаций (`../docker-co
 
 ```
 src/
-├── main.api.ts                # точка входа API: NestFactory.create(ApiModule), CORS, listen
-├── main.worker.ts             # точка входа воркера: createApplicationContext(WorkerModule), без HTTP
-├── repl.ts, repl.module.ts    # консоль с загруженным приложением (аналог rails c)
-├── api.module.ts              # корень API + глобальные pipe и filter (APP_PIPE / APP_FILTER)
-├── worker.module.ts           # корень воркера
+├── main.api.ts                      # точка входа API: NestFactory.create(ApiModule), CORS, listen
+├── main.worker.ts                   # точка входа воркера: createApplicationContext(WorkerModule), без HTTP
+├── repl.ts, repl.module.ts          # консоль с загруженным приложением (аналог rails c)
+├── api.module.ts                    # корень API + глобальные pipe и filter (APP_PIPE / APP_FILTER)
+├── worker.module.ts                 # корень воркера
 │
-├── config/                    # инфраструктура: конфигурация
-│   ├── env.schema.ts          #   zod-схемы окружения: databaseEnvSchema ⊂ envSchema
-│   ├── app.config.ts          #   registerAs('app') для приложения, loadDatabaseConfig() для команд БД
-│   ├── env-file.ts            #   путь к .env от файла, а не от cwd
-│   └── config.module.ts       #   @nestjs/config
-├── database/                  # инфраструктура: Postgres
-│   ├── database.module.ts     #   @Global: пул pg (PG_POOL) и Drizzle (DATABASE), закрытие пула
-│   ├── postgres.ts            #   настройки пула, «база недоступна» vs «ошибка запроса»
-│   ├── create-database.ts     #   CREATE DATABASE, если её нет (аналог rails db:create)
-│   ├── migrate.ts             #   применение SQL-миграций из drizzle/
-│   └── cli.ts                 #   create | migrate | prepare — без контейнера Nest и без ключей API
-├── logging/                   # nestjs-pino: JSON-логи, в терминале pino-pretty
-├── redis/                     # провайдер REDIS_CLIENT (ioredis) — только для health-check
-├── queue/                     # BullModule.forRoot: соединения BullMQ для API и для воркера
-├── health/                    # GET /health через @nestjs/terminus: свои индикаторы Postgres и Redis
-├── common/
-│   ├── errors/                # DomainError, NotFoundError, StorageUnavailableError
-│   ├── filters/               # DomainExceptionFilter: домен → HTTP, тело {"detail": ...}
-│   ├── pipes/                 # ZodValidationPipe: ошибка → 422
-│   └── validation/            # createZodDto: zod-схема → класс-DTO
+├── core/                            # инфраструктура: не знает о предметной области
+│   ├── config/                      # конфигурация
+│   │   ├── env.schema.ts            #   zod-схемы окружения: databaseEnvSchema ⊂ envSchema
+│   │   ├── app.config.ts            #   registerAs('app') для приложения, loadDatabaseConfig() для команд БД
+│   │   ├── env-file.ts              #   путь к .env от файла, а не от cwd
+│   │   └── config.module.ts         #   @nestjs/config
+│   ├── database/                    # Postgres
+│   │   ├── database.module.ts       #   @Global: пул pg (PG_POOL) и Drizzle (DATABASE), закрытие пула
+│   │   ├── postgres.ts              #   настройки пула, «база недоступна» vs «ошибка запроса»
+│   │   ├── create-database.ts       #   CREATE DATABASE, если её нет (аналог rails db:create)
+│   │   ├── migrate.ts               #   применение SQL-миграций из drizzle/
+│   │   └── cli.ts                   #   create | migrate | prepare — без контейнера Nest и без ключей API
+│   ├── logging/                     # nestjs-pino: JSON-логи, в терминале pino-pretty
+│   ├── redis/                       # провайдер REDIS_CLIENT (ioredis) — только для health-check
+│   ├── queue/                       # BullModule.forRoot: соединения BullMQ для API и для воркера
+│   └── health/                      # GET /health через @nestjs/terminus: свои индикаторы Postgres и Redis
+├── common/                          # общий код без своих провайдеров
+│   ├── errors/                      # DomainError, NotFoundError, StorageUnavailableError
+│   ├── filters/                     # DomainExceptionFilter: домен → HTTP, тело {"detail": ...}
+│   ├── pipes/                       # ZodValidationPipe: ошибка → 422
+│   └── validation/                  # createZodDto: zod-схема → класс-DTO
 │
-├── youtube/                   # YoutubeModule, экспортирует только COMMENT_SOURCE
-│   ├── youtube.client.ts      #   fetch + таймаут + пагинация + повторы (p-retry)
-│   └── youtube.errors.ts
-├── llm/                       # LlmModule, экспортирует только COMMENT_CLASSIFIER
-│   ├── language-model.factory.ts  # LLM_MODEL "provider:model" → модель Vercel AI SDK
-│   ├── llm-comment-classifier.ts  # батчи, p-limit, структурированный ответ по zod-схеме
-│   └── prompt.ts
-│
-└── analysis/                  # домен «анализ комментариев»
-    ├── analysis.module.ts     #   forApi() / forWorker(): две сборки одного модуля
-    ├── domain/                #   типы и правила без зависимостей от фреймворка и БД
-    │   ├── analysis-task.ts   #   доменная сущность AnalysisTask
-    │   ├── category.ts, task-status.ts, comment.ts
-    │   ├── group-by-category.ts
-    │   ├── ports.ts           #   TaskQueue, CommentSource, CommentClassifier + токены
-    │   └── errors.ts
-    ├── dto/                   #   вход (zod) и выход (snake_case) HTTP
-    ├── youtube-url.ts         #   разбор ссылок → id видео
-    ├── analysis.controller.ts #   только HTTP
-    ├── analysis.service.ts    #   API-сторона: создать задачу, получить статус
-    ├── comment-analyzer.service.ts  # воркер-сторона: обработать задачу
-    ├── analysis-task.table.ts #   модель хранения: таблица analysis_tasks (Drizzle)
-    ├── task.repository.ts     #   AnalysisTask ⇄ analysis_tasks, ошибки соединения → 503
-    └── queue/
-        ├── analyze-video.job.ts     # контракт job: имя, данные, попытки, таймаут
-        ├── bullmq-task-queue.ts     # реализация TaskQueue (API ставит задачи)
-        └── analysis.processor.ts    # @Processor: воркер забирает задачи
-drizzle/                       # SQL-миграции и снимки схемы, генерирует drizzle-kit
-drizzle.config.ts              # настройки drizzle-kit (только для генерации миграций)
+└── modules/                         # предметная область и интеграции с внешними сервисами
+    ├── youtube/                     # YoutubeModule, экспортирует только COMMENT_SOURCE
+    │   ├── youtube.client.ts        #   fetch + таймаут + пагинация + повторы (p-retry)
+    │   └── youtube.errors.ts
+    ├── llm/                         # LlmModule, экспортирует только COMMENT_CLASSIFIER
+    │   ├── language-model.factory.ts  # LLM_MODEL "provider:model" → модель Vercel AI SDK
+    │   ├── llm-comment-classifier.ts  # батчи, p-limit, структурированный ответ по zod-схеме
+    │   └── prompt.ts
+    └── analysis/                    # домен «анализ комментариев»
+        ├── analysis.module.ts       #   forApi() / forWorker(): две сборки одного модуля
+        ├── domain/                  #   типы и правила без зависимостей от фреймворка и БД
+        │   ├── analysis-task.ts     #   доменная сущность AnalysisTask
+        │   ├── category.ts, task-status.ts, comment.ts
+        │   ├── group-by-category.ts
+        │   ├── ports.ts             #   TaskQueue, CommentSource, CommentClassifier + токены
+        │   └── errors.ts
+        ├── dto/                     #   вход (zod) и выход (snake_case) HTTP
+        ├── youtube-url.ts           #   разбор ссылок → id видео
+        ├── analysis.controller.ts   #   только HTTP
+        ├── analysis.service.ts      #   API-сторона: создать задачу, получить статус
+        ├── comment-analyzer.service.ts  # воркер-сторона: обработать задачу
+        ├── analysis-task.table.ts   #   модель хранения: таблица analysis_tasks (Drizzle)
+        ├── task.repository.ts       #   AnalysisTask ⇄ analysis_tasks, ошибки соединения → 503
+        └── queue/
+            ├── analyze-video.job.ts # контракт job: имя, данные, попытки, таймаут
+            ├── bullmq-task-queue.ts # реализация TaskQueue (API ставит задачи)
+            └── analysis.processor.ts  # @Processor: воркер забирает задачи
+drizzle/                             # SQL-миграции и снимки схемы, генерирует drizzle-kit
+drizzle.config.ts                    # настройки drizzle-kit (только для генерации миграций)
 test/
-├── global-setup.ts            # один раз на прогон: тестовая база + миграции с нуля
-├── support/                   # транзакция теста, фейки портов, тестовая конфигурация, сборка API
-├── unit/                      # без базы: URL, группировка, конфиг, клиент YouTube (msw),
-│                              # LLM (mock-модель), адаптер очереди, процессор
-├── integration/               # с тестовой базой: репозиторий, AnalysisService, CommentAnalyzer
-└── e2e/                       # HTTP API через supertest; путь API → очередь → процессор
+├── global-setup.ts                  # один раз на прогон: тестовая база + миграции с нуля
+├── support/                         # транзакция теста, фейки портов, тестовая конфигурация, сборка API
+├── unit/                            # без базы: URL, группировка, конфиг, клиент YouTube (msw),
+│                                    # LLM (mock-модель), адаптер очереди, процессор
+├── integration/                     # с тестовой базой: репозиторий, AnalysisService, CommentAnalyzer
+└── e2e/                             # HTTP API через supertest; путь API → очередь → процессор
 ```
 
+`core/` — инфраструктура, которая без изменений перенеслась бы в другой проект: она не знает
+о предметной области (аналог `config/initializers` и `lib/` в Rails). `modules/` — аналог `app/`:
+предметная область и клиенты внешних сервисов. YouTube и LLM лежат здесь, а не в `core/`: у них
+своя логика (пагинация, повторы, батчи, промпт), и они реализуют порты домена. Таблица
+`analysis-task.table.ts` тоже принадлежит модулю, `core/database` даёт только подключение.
+
 Имена файлов — kebab-case с ролью через точку (`analysis.service.ts`, `analyze-request.dto.ts`),
-как генерирует Nest CLI. Импорты выше по дереву — через алиасы из `tsconfig.json`:
-`@/config/app.config` (это `src/`) и `@test/support/fakes`. Соседние файлы модуля — через `./`,
+как генерирует Nest CLI. Импорты выше по дереву — через алиасы из `tsconfig.json`: `@/` — это
+`src/` (`@/core/config/app.config`), `@test/` — `test/` (`@test/support/fakes`). Соседние файлы модуля — через `./`,
 чтобы при переносе папки целиком эти импорты не менялись. `../` запрещён правилом ESLint.
 `nest build` переписывает алиасы в относительные пути, Vitest читает их из `tsconfig.json`
 (`resolve.tsconfigPaths`).
@@ -166,7 +173,7 @@ AnalysisProcessor ──► CommentAnalyzer ──► TaskRepository
 
 **Миграции — drizzle-kit + свой скрипт.** `npm run db:generate` сравнивает схему в коде
 с последним снимком и пишет SQL-файл в `drizzle/` (аналог `alembic revision --autogenerate`).
-Применяет миграции `src/database/cli.ts` через `migrate()` из `drizzle-orm`, поэтому drizzle-kit
+Применяет миграции `src/core/database/cli.ts` через `migrate()` из `drizzle-orm`, поэтому drizzle-kit
 остаётся dev-зависимостью и в образ не попадает. Откатных (down) миграций у Drizzle нет.
 
 Команды БД работают без контейнера Nest и читают только `DATABASE_URL` и `LOG_LEVEL`
@@ -203,7 +210,7 @@ Invalid environment configuration:
   backend остановила бы запись у всех. Это константы в `analyze-video.job.ts`, а не переменные
   окружения: меняются редко.
 
-**Соединения с Redis** (`queue/queue.module.ts`, `redis/redis.module.ts`):
+**Соединения с Redis** (`core/queue/queue.module.ts`, `core/redis/redis.module.ts`):
 
 - воркер: `maxRetriesPerRequest: null` (требование BullMQ к Worker) и **никакого `commandTimeout`**.
   Иначе ioredis оборвал бы блокирующее ожидание задачи (`BZPOPMIN`) на паузах в очереди.
@@ -234,7 +241,7 @@ zod-схема, SDK валидирует ответ. Провайдер выби
 | Валидация                     | pydantic                                   | zod (+ свой pipe)                                                                   |
 | Хранение задач                | Postgres, SQLAlchemy 2 (async) + asyncpg   | Postgres, Drizzle ORM + `pg`                                                        |
 | Миграции                      | Alembic                                    | drizzle-kit (генерация) + `migrate()` (применение)                                  |
-| Создание базы                 | `python -m app.db.create`                  | `node dist/database/cli.js create` (`npm run db:create`)                            |
+| Создание базы                 | `python -m app.db.create`                  | `node dist/core/database/cli.js create` (`npm run db:create`)                       |
 | Очередь                       | taskiq, `ListQueueBroker` (`BRPOP`)        | BullMQ: lock, stalled-recovery, попытки, `UnrecoverableError`                       |
 | Задача при падении воркера    | Теряется                                   | Возвращается в очередь                                                              |
 | Повтор при временной ошибке   | Нет: сразу `failed`                        | До 3 попыток, между ними статус `pending`                                           |
@@ -296,7 +303,7 @@ npm run start:worker
 
 `.env` находится от любого текущего каталога: `cd /tmp && node ~/…/backend-node-nest-js/dist/main.worker.js` работает.
 
-Команды БД (`db:*` собирают проект через `nest start`; из собранного кода — `node dist/database/cli.js <команда>`):
+Команды БД (`db:*` собирают проект через `nest start`; из собранного кода — `node dist/core/database/cli.js <команда>`):
 
 ```bash
 npm run db:create     # rails db:create
@@ -315,7 +322,7 @@ docker compose up --build
 Один образ (многоэтапный `Dockerfile`: deps → build → runtime без dev-зависимостей,
 пользователь `node`) и три сервиса в сети `ayc-infra`:
 
-- `migrate` — одноразовый, `node dist/database/cli.js prepare` (аналог `rails db:prepare`);
+- `migrate` — одноразовый, `node dist/core/database/cli.js prepare` (аналог `rails db:prepare`);
 - `api` и `worker` стартуют после его успешного завершения (`service_completed_successfully`).
 
 У воркера `stop_grace_period: 60s`: по `SIGTERM` он дорабатывает текущие задачи.

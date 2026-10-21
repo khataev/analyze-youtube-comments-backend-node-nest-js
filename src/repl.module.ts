@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ApiModule } from './api.module';
-import { LlmModule } from './llm/llm.module';
-import { YoutubeModule } from './youtube/youtube.module';
+import { LlmModule } from './modules/llm/llm.module';
+import { YoutubeModule } from './modules/youtube/youtube.module';
 
 /**
  * Граф для консоли: всё из API (сервис, репозиторий, очередь-продюсер) плюс клиенты

@@ -15,7 +15,7 @@ services:
   # Аналог `rails db:prepare`: создать базу, если её нет, и применить миграции. Ключи не нужны
   migrate:
     <<: *app
-    command: ['node', 'dist/database/cli.js', 'prepare']
+    command: ['node', 'dist/core/database/cli.js', 'prepare']
 
   api:
     <<: *app

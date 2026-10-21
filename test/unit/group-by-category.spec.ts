@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { Category } from '@/analysis/domain/category';
-import { groupByCategory } from '@/analysis/domain/group-by-category';
+import { Category } from '@/modules/analysis/domain/category';
+import { groupByCategory } from '@/modules/analysis/domain/group-by-category';
 
 const comments = [
   { id: 'a', text: 'Thank you!' },

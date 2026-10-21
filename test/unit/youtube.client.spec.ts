@@ -1,13 +1,13 @@
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
-import { COMMENT_THREADS_URL, YoutubeClient } from '@/youtube/youtube.client';
+import { COMMENT_THREADS_URL, YoutubeClient } from '@/modules/youtube/youtube.client';
 import {
   CommentsUnavailableError,
   VideoNotFoundError,
   YoutubeRequestRejectedError,
   YoutubeUnavailableError,
-} from '@/youtube/youtube.errors';
+} from '@/modules/youtube/youtube.errors';
 import { testConfig } from '@test/support/config';
 
 /** msw перехватывает глобальный fetch — аналог respx для httpx. */

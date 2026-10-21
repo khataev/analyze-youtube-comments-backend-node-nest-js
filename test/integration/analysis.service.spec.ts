@@ -1,12 +1,12 @@
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { AnalysisService } from '@/analysis/analysis.service';
-import { TaskNotFoundError } from '@/analysis/domain/errors';
-import { TASK_QUEUE } from '@/analysis/domain/ports';
-import { TaskStatus } from '@/analysis/domain/task-status';
-import { TaskRepository } from '@/analysis/task.repository';
+import { AnalysisService } from '@/modules/analysis/analysis.service';
+import { TaskNotFoundError } from '@/modules/analysis/domain/errors';
+import { TASK_QUEUE } from '@/modules/analysis/domain/ports';
+import { TaskStatus } from '@/modules/analysis/domain/task-status';
+import { TaskRepository } from '@/modules/analysis/task.repository';
 import { StorageUnavailableError } from '@/common/errors/domain.error';
-import { analysisTasksTable } from '@/analysis/analysis-task.table';
+import { analysisTasksTable } from '@/modules/analysis/analysis-task.table';
 import { FakeQueue } from '@test/support/fakes';
 import { useTestDatabase } from '@test/support/database';
 
