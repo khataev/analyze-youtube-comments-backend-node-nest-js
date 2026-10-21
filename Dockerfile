@@ -14,16 +14,18 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 FROM deps AS build
 COPY tsconfig.json tsconfig.build.json nest-cli.json ./
 COPY src ./src
+COPY drizzle ./drizzle
 RUN npm run build && npm prune --omit=dev
 
-# --- runtime: только node_modules для прода и собранный dist ---
+# --- runtime: только node_modules для прода, собранный dist и SQL-миграции ---
 FROM node:24-alpine AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=build --chown=node:node /app/package.json ./
 COPY --from=build --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/dist ./dist
+COPY --from=build --chown=node:node /app/drizzle ./drizzle
 USER node
 EXPOSE 8000
-# Один образ для API и воркера: воркер переопределяет команду в docker-compose.yml
+# Один образ для API, воркера и миграций: команду переопределяет docker-compose.yml
 CMD ["node", "dist/main.api.js"]

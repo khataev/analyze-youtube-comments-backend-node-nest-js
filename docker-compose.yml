@@ -1,27 +1,37 @@
+# Redis и Postgres общие для всех backend-* и запускаются отдельно:
+#   docker compose -f ../docker-compose.yml up -d
+# Здесь только сервисы этого backend.
+
+x-app: &app
+  build: .
+  env_file: .env
+  environment:
+    # Адреса внутри сети ayc-infra; у Node-версии своя база и номер БД Redis (см. ../README.md)
+    DATABASE_URL: postgres://app:app@postgres:5432/analysis_node
+    REDIS_URL: redis://redis:6379/2
+  networks: [infra]
+
 services:
-  redis:
-    image: redis:8-alpine
-    ports: ['6379:6379']
-    healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
-      interval: 5s
+  # Аналог `rails db:prepare`: создать базу, если её нет, и применить миграции. Ключи не нужны
+  migrate:
+    <<: *app
+    command: ['node', 'dist/database/cli.js', 'prepare']
 
   api:
-    build: .
-    env_file: .env
-    environment:
-      REDIS_URL: redis://redis:6379/0
+    <<: *app
     ports: ['8000:8000']
     depends_on:
-      redis: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
 
   worker:
-    build: .
+    <<: *app
     command: ['node', 'dist/main.worker.js']
-    env_file: .env
-    environment:
-      REDIS_URL: redis://redis:6379/0
     # SIGTERM → воркер дорабатывает текущие задачи; даём на это время до SIGKILL
     stop_grace_period: 60s
     depends_on:
-      redis: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
+
+networks:
+  infra:
+    external: true
+    name: ayc-infra
