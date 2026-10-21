@@ -17,8 +17,8 @@ const redisClientProvider = {
   useFactory: async (config: AppConfig): Promise<Redis> => {
     const url = redactUrl(config.redis.url);
     const client = new Redis(config.redis.url, {
-      // Этот клиент делает только короткие GET/SET/PING, поэтому падаем быстро:
-      // при недоступном Redis запрос API получит 503, а не повиснет.
+      // Этот клиент нужен только health-check (PING), поэтому падаем быстро:
+      // при недоступном Redis /health сразу ответит 503, а не повиснет.
       // (Блокирующее ожидание очереди идёт через отдельные соединения BullMQ, см. QueueModule.)
       lazyConnect: true,
       enableOfflineQueue: false,

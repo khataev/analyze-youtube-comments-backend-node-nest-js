@@ -21,7 +21,12 @@ async function bootstrap(): Promise<void> {
 
   await app.listen(config.port, '0.0.0.0');
   logger.log(
-    { redis: redactUrl(config.redis.url), queue: ANALYSIS_QUEUE, port: config.port },
+    {
+      postgres: redactUrl(config.database.url),
+      redis: redactUrl(config.redis.url),
+      queue: ANALYSIS_QUEUE,
+      port: config.port,
+    },
     'API ready: tasks go to the queue',
   );
 }

@@ -26,6 +26,7 @@ async function bootstrap(): Promise<void> {
   const config = app.get<AppConfig>(appConfig.KEY);
   logger.log(
     {
+      postgres: redactUrl(config.database.url),
       redis: redactUrl(config.redis.url),
       queue: ANALYSIS_QUEUE,
       concurrency: config.worker.concurrency,

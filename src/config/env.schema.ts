@@ -63,11 +63,6 @@ export const envSchema = databaseEnvSchema.extend({
   LLM_BATCH_SIZE: z.coerce.number().int().positive().default(50),
   LLM_CONCURRENCY: z.coerce.number().int().positive().default(4),
 
-  TASK_TTL_SECONDS: z.coerce
-    .number()
-    .int()
-    .positive()
-    .default(24 * 60 * 60),
   WORKER_CONCURRENCY: z.coerce.number().int().positive().default(2),
   PORT: z.coerce.number().int().min(1).max(65535).default(8000),
 });

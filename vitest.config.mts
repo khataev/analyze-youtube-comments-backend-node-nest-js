@@ -5,8 +5,10 @@ export default defineConfig({
   test: {
     include: ['test/**/*.spec.ts'],
     environment: 'node',
+    // Один раз на прогон: тестовая база и миграции. Каждый тест — в транзакции с откатом
+    globalSetup: ['test/global-setup.ts'],
     setupFiles: ['test/setup.ts'],
-    // Тестам не нужны ни .env, ни внешние сервисы
+    // Из внешних сервисов тестам нужен только Postgres; .env не читается
     env: { NODE_ENV: 'test' },
   },
   // esbuild (дефолт Vite) не умеет emitDecoratorMetadata, без которой не работает DI Nest.

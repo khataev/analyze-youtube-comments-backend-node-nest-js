@@ -47,7 +47,7 @@ export class CommentAnalyzer {
   async run(taskId: string, options: RunOptions): Promise<void> {
     const found = await this.repository.get(taskId);
     if (found === null) {
-      this.logger.warn('Task not found (expired?), skipping');
+      this.logger.warn('Task not found, skipping');
       return;
     }
     if (isFinished(found.status)) {

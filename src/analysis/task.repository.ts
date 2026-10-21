@@ -1,53 +1,72 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { Redis } from 'ioredis';
+import { eq, sql } from 'drizzle-orm';
 import { StorageUnavailableError } from '../common/errors/domain.error';
-import { type AppConfig, appConfig } from '../config/app.config';
-import { REDIS_CLIENT } from '../redis/redis.constants';
-import {
-  serializeAnalysisTask,
-  storedAnalysisTaskSchema,
-  type AnalysisTask,
-} from './domain/analysis-task';
+import { DATABASE, type Database } from '../database/database.constants';
+import { isConnectionError } from '../database/postgres';
+import { analysisTasksTable } from './analysis-task.table';
+import type { AnalysisTask } from './domain/analysis-task';
+
+type AnalysisTaskColumns = typeof analysisTasksTable.$inferSelect;
 
 /**
- * Хранение статусов задач. Сервисы не знают, что внутри Redis: его можно заменить на БД,
- * поменяв только этот класс. Ошибки соединения переводятся в доменную StorageUnavailableError.
+ * Хранение задач в Postgres. Сервисы работают с доменной AnalysisTask и не знают о таблице:
+ * репозиторий переводит одно в другое.
+ *
+ * Каждая операция — один SQL-оператор, то есть своя короткая транзакция (autocommit):
+ * соединение берётся из пула на время запроса, даже если обработка задачи идёт минутами.
+ * Если операции понадобится несколько операторов, её нужно обернуть в this.db.transaction().
+ *
+ * Ошибки соединения переводятся в доменную StorageUnavailableError (503). Остальные ошибки
+ * базы — это баги (нет таблицы, нарушено ограничение), их не маскируем.
  */
 @Injectable()
 export class TaskRepository {
-  static readonly KEY_PREFIX = 'analysis:task:';
+  constructor(@Inject(DATABASE) private readonly db: Database) {}
 
-  private readonly ttlSeconds: number;
-
-  constructor(
-    @Inject(REDIS_CLIENT) private readonly redis: Redis,
-    @Inject(appConfig.KEY) config: AppConfig,
-  ) {
-    this.ttlSeconds = config.tasks.ttlSeconds;
-  }
-
+  /** Создать или обновить задачу (upsert). updated_at ставит база. */
   async save(task: AnalysisTask): Promise<AnalysisTask> {
-    const updated = { ...task, updatedAt: new Date() };
-    await this.call(() =>
-      this.redis.set(this.key(task.id), serializeAnalysisTask(updated), 'EX', this.ttlSeconds),
+    const changes = {
+      status: task.status,
+      result: task.result,
+      error: task.error,
+      updatedAt: sql`now()`,
+    };
+    const [saved] = await this.call(() =>
+      this.db
+        .insert(analysisTasksTable)
+        .values({ id: task.id, videoId: task.videoId, createdAt: task.createdAt, ...changes })
+        .onConflictDoUpdate({ target: analysisTasksTable.id, set: changes })
+        .returning(),
     );
-    return updated;
+    if (saved === undefined) throw new Error(`Task ${task.id} was not saved`);
+    return toDomain(saved);
   }
 
-  async get(taskId: string): Promise<AnalysisTask | null> {
-    const raw = await this.call(() => this.redis.get(this.key(taskId)));
-    return raw === null ? null : storedAnalysisTaskSchema.parse(JSON.parse(raw));
+  async get(id: string): Promise<AnalysisTask | null> {
+    const [found] = await this.call(() =>
+      this.db.select().from(analysisTasksTable).where(eq(analysisTasksTable.id, id)).limit(1),
+    );
+    return found === undefined ? null : toDomain(found);
   }
 
-  private key(taskId: string): string {
-    return `${TaskRepository.KEY_PREFIX}${taskId}`;
-  }
-
-  private async call<T>(command: () => Promise<T>): Promise<T> {
+  private async call<T>(query: () => Promise<T>): Promise<T> {
     try {
-      return await command();
+      return await query();
     } catch (err) {
-      throw new StorageUnavailableError({ cause: err });
+      if (isConnectionError(err)) throw new StorageUnavailableError({ cause: err });
+      throw err;
     }
   }
+}
+
+function toDomain(stored: AnalysisTaskColumns): AnalysisTask {
+  return {
+    id: stored.id,
+    videoId: stored.videoId,
+    status: stored.status,
+    result: stored.result,
+    error: stored.error,
+    createdAt: stored.createdAt,
+    updatedAt: stored.updatedAt,
+  };
 }

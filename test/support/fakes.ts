@@ -1,7 +1,6 @@
 import type { Comment, CommentClassification } from '../../src/analysis/domain/comment';
 import { Category } from '../../src/analysis/domain/category';
 import type { CommentClassifier, CommentSource, TaskQueue } from '../../src/analysis/domain/ports';
-import type { AnalysisTask } from '../../src/analysis/domain/analysis-task';
 
 /*
  * Фейки портов: простые классы вместо моков, как в Python-версии.
@@ -39,22 +38,7 @@ export class FakeClassifier implements CommentClassifier {
   }
 }
 
-/** Замена TaskRepository (Redis) на Map — с тем же публичным интерфейсом. */
-export class InMemoryTaskRepository {
-  readonly tasks = new Map<string, AnalysisTask>();
-
-  save(task: AnalysisTask): Promise<AnalysisTask> {
-    const updated = { ...task, updatedAt: new Date() };
-    this.tasks.set(task.id, updated);
-    return Promise.resolve(updated);
-  }
-
-  get(taskId: string): Promise<AnalysisTask | null> {
-    return Promise.resolve(this.tasks.get(taskId) ?? null);
-  }
-}
-
-/** Клиент Redis для модулей, которые его внедряют (health, shutdown hook). */
+/** Клиент Redis для модулей, которые его внедряют (health, shutdown hook). Очередь мокается отдельно. */
 export function fakeRedis(ping: () => Promise<string> = () => Promise.resolve('PONG')) {
   return { ping, status: 'end', disconnect: () => undefined, quit: () => Promise.resolve('OK') };
 }

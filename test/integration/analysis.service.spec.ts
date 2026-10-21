@@ -6,15 +6,18 @@ import { TASK_QUEUE } from '../../src/analysis/domain/ports';
 import { TaskStatus } from '../../src/analysis/domain/task-status';
 import { TaskRepository } from '../../src/analysis/task.repository';
 import { StorageUnavailableError } from '../../src/common/errors/domain.error';
-import { FakeQueue, InMemoryTaskRepository } from '../support/fakes';
+import { analysisTasksTable } from '../../src/analysis/analysis-task.table';
+import { FakeQueue } from '../support/fakes';
+import { useTestDatabase } from '../support/database';
 
 describe('AnalysisService', () => {
+  const db = useTestDatabase();
   let service: AnalysisService;
-  let repository: InMemoryTaskRepository;
+  let repository: TaskRepository;
   let queue: FakeQueue;
 
   beforeEach(async () => {
-    repository = new InMemoryTaskRepository();
+    repository = new TaskRepository(db());
     queue = new FakeQueue();
     // Тестовый модуль Nest: собираем только сервис, зависимости — фейки
     const moduleRef = await Test.createTestingModule({
@@ -41,7 +44,7 @@ describe('AnalysisService', () => {
 
     await expect(service.start('dQw4w9WgXcQ')).rejects.toBeInstanceOf(StorageUnavailableError);
 
-    const [stored] = [...repository.tasks.values()];
+    const [stored] = await db().select().from(analysisTasksTable);
     expect(stored).toMatchObject({ status: TaskStatus.Failed, error: 'Failed to enqueue task' });
   });
 

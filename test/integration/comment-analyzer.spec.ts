@@ -7,19 +7,21 @@ import { createAnalysisTask } from '../../src/analysis/domain/analysis-task';
 import { TaskStatus } from '../../src/analysis/domain/task-status';
 import { TaskRepository } from '../../src/analysis/task.repository';
 import { VideoNotFoundError, YoutubeUnavailableError } from '../../src/youtube/youtube.errors';
-import { FakeClassifier, FakeSource, InMemoryTaskRepository } from '../support/fakes';
+import { useTestDatabase } from '../support/database';
+import { FakeClassifier, FakeSource } from '../support/fakes';
 import { quietLogger } from '../support/logging';
 
 const TASK_ID = '11111111-1111-4111-8111-111111111111';
 
 describe('CommentAnalyzer', () => {
+  const db = useTestDatabase();
   let analyzer: CommentAnalyzer;
-  let repository: InMemoryTaskRepository;
+  let repository: TaskRepository;
   let source: FakeSource;
   let classifier: FakeClassifier;
 
   beforeEach(async () => {
-    repository = new InMemoryTaskRepository();
+    repository = new TaskRepository(db());
     source = new FakeSource([
       { id: 'a', text: 'Thanks!' },
       { id: 'b', text: 'Thank you' },

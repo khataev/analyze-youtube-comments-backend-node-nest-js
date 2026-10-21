@@ -13,7 +13,6 @@ describe('loadAppConfig', () => {
       redis: { url: 'redis://localhost:6379/2' },
       youtube: { apiKey: 'key', maxComments: 200 },
       llm: { model: 'deepseek:deepseek-chat', apiKey: undefined, batchSize: 50, concurrency: 4 },
-      tasks: { ttlSeconds: 86_400 },
     });
   });
 

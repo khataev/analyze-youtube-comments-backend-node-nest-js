@@ -10,19 +10,22 @@ import type { AnalyzeVideoJobData } from '../../src/analysis/queue/analyze-video
 import { TaskRepository } from '../../src/analysis/task.repository';
 import { appConfig } from '../../src/config/app.config';
 import { createApiApp } from '../support/api-app';
+import { useTestDatabase } from '../support/database';
 import { testConfig } from '../support/config';
 import { FakeClassifier, FakeSource } from '../support/fakes';
 import { silentLoggerModule } from '../support/logging';
 
 /**
- * Путь «API → очередь → процессор» без Redis. Связующее звено — аргументы queue.add():
+ * Путь «API → очередь → процессор» без Redis, хранилище — тестовая база Postgres. Связующее звено — аргументы queue.add():
  * берём ровно то, что API положил в очередь, собираем из этого Job и отдаём процессору воркера.
  * Так проверяется контракт продюсера и консьюмера (имя job, форма данных, опции),
  * а поведение самого BullMQ — забота библиотеки.
  */
 describe('API → queue → processor', () => {
+  const db = useTestDatabase();
+
   it('processes a task created via HTTP up to the completed status', async () => {
-    const { app, repository, queue } = await createApiApp();
+    const { app, queue } = await createApiApp({ db: db() });
     const http = request(app.getHttpServer());
 
     // 1. API: создаём задачу
@@ -43,13 +46,13 @@ describe('API → queue → processor', () => {
     const [name, data, opts] = queue.add.mock.calls[0] as [string, AnalyzeVideoJobData, object];
 
     // 3. Воркер: процессор с теми же провайдерами, что в AnalysisModule.forWorker(),
-    //    внешние клиенты — фейки, хранилище общее с API
+    //    внешние клиенты — фейки, база общая с API (та же транзакция теста)
     const worker = await Test.createTestingModule({
       imports: [silentLoggerModule()],
       providers: [
         AnalysisProcessor,
         CommentAnalyzer,
-        { provide: TaskRepository, useValue: repository },
+        { provide: TaskRepository, useValue: new TaskRepository(db()) },
         { provide: appConfig.KEY, useValue: testConfig() },
         {
           provide: COMMENT_SOURCE,

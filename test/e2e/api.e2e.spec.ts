@@ -1,22 +1,26 @@
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Category } from '../../src/analysis/domain/category';
 import { createAnalysisTask } from '../../src/analysis/domain/analysis-task';
 import { TaskStatus } from '../../src/analysis/domain/task-status';
+import { TaskRepository } from '../../src/analysis/task.repository';
 import { createApiApp } from '../support/api-app';
-import { fakeRedis, type InMemoryTaskRepository } from '../support/fakes';
+import { unreachableDatabase, useTestDatabase } from '../support/database';
+import { fakeRedis } from '../support/fakes';
 
 const VIDEO_URL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
 const UNKNOWN_ID = '00000000-0000-4000-8000-000000000000';
 
 describe('HTTP API', () => {
+  const db = useTestDatabase();
   let app: INestApplication;
-  let repository: InMemoryTaskRepository;
+  let repository: TaskRepository;
   let queue: Awaited<ReturnType<typeof createApiApp>>['queue'];
 
   beforeEach(async () => {
-    ({ app, repository, queue } = await createApiApp());
+    ({ app, queue } = await createApiApp({ db: db() }));
+    repository = new TaskRepository(db());
   });
 
   afterEach(async () => {
@@ -95,22 +99,57 @@ describe('HTTP API', () => {
   });
 
   describe('GET /health', () => {
-    it('returns 200 when Redis answers', async () => {
+    it('returns 200 when Postgres and Redis answer', async () => {
       const response = await http().get('/health').expect(200);
-      expect(response.body).toMatchObject({ status: 'ok' });
+      expect(response.body).toMatchObject({
+        status: 'ok',
+        info: { postgres: { status: 'up' }, redis: { status: 'up' } },
+      });
     });
   });
 });
 
 describe('HTTP API with Redis down', () => {
+  const db = useTestDatabase();
+
   it('GET /health returns 503', async () => {
     const { app } = await createApiApp({
+      db: db(),
       redis: fakeRedis(() => Promise.reject(new Error('ECONNREFUSED'))),
     });
 
     const response = await request(app.getHttpServer()).get('/health').expect(503);
 
-    expect(response.body).toMatchObject({ status: 'error' });
+    expect(response.body).toMatchObject({ status: 'error', error: { redis: { status: 'down' } } });
     await app.close();
+  });
+});
+
+describe('HTTP API with Postgres down', () => {
+  const unreachable = unreachableDatabase();
+  let app: INestApplication;
+
+  beforeEach(async () => {
+    ({ app } = await createApiApp({ db: unreachable.db, pool: unreachable.pool }));
+  });
+
+  afterEach(async () => {
+    await app.close();
+  });
+
+  afterAll(() => unreachable.pool.end());
+
+  it('returns 503 without internal details', async () => {
+    const response = await request(app.getHttpServer())
+      .get(`/api/v1/analysis/${UNKNOWN_ID}`)
+      .expect(503);
+
+    expect(response.body).toEqual({ detail: 'Storage is unavailable' });
+  });
+
+  it('GET /health returns 503', async () => {
+    const response = await request(app.getHttpServer()).get('/health').expect(503);
+
+    expect(response.body).toMatchObject({ error: { postgres: { status: 'down' } } });
   });
 });

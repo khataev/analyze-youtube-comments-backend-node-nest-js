@@ -21,7 +21,6 @@ export function loadAppConfig(env: Environment) {
       batchSize: e.LLM_BATCH_SIZE,
       concurrency: e.LLM_CONCURRENCY,
     },
-    tasks: { ttlSeconds: e.TASK_TTL_SECONDS },
     worker: { concurrency: e.WORKER_CONCURRENCY },
   };
 }
